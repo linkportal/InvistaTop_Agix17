@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>InvistaTop - Investimentos Imobiliários Inteligentes</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .gradient-bg { background: linear-gradient(135deg, #1B4EFF 0%, #0039CB 100%); }
+    </style>
+</head>
+<body class="bg-gray-50">
+
+<!-- NAVBAR -->
+<nav class="bg-white shadow-lg sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between items-center h-16">
+            <div class="flex items-center">
+                <span class="text-2xl font-bold text-blue-600">InvistaTop</span>
+            </div>
+            <div class="hidden md:block">
+                <div class="ml-10 flex items-baseline space-x-4">
+                    <a href="#projetos" class="text-gray-700 hover:text-blue-600 px-3 py-2">Projetos</a>
+                    <a href="#como-funciona" class="text-gray-700 hover:text-blue-600 px-3 py-2">Como Funciona</a>
+                    <a href="#login" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">Entrar</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- HERO SECTION -->
+<section class="gradient-bg text-white py-20">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center">
+            <h1 class="text-5xl font-bold mb-6">
+                Invista em Imóveis Industriais com
+                <span class="bg-gradient-to-r from-green-400 to-blue-400 bg-clip-text text-transparent"> Inteligência</span>
+            </h1>
+            <p class="text-xl mb-8 max-w-2xl mx-auto">
+                Rentabilidade acima do mercado com segurança de investimentos imobiliários industriais
+            </p>
+            <div class="flex gap-4 justify-center flex-wrap">
+                <button onclick="abrirCadastro()" class="bg-green-500 hover:bg-green-600 px-8 py-3 rounded-lg font-semibold flex items-center gap-2">
+                    Começar Agora →
+                </button>
+                <button onclick="scrollToProjetos()" class="border border-white px-8 py-3 rounded-lg font-semibold hover:bg-white/10">
+                    Ver Projetos
+                </button>
+            </div>
+        </div>
+        
+        <div class="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="text-center">
+                <div class="text-3xl font-bold text-green-400">12.5%</div>
+                <p class="text-sm opacity-80">Rentabilidade Média Anual</p>
+            </div>
+            <div class="text-center">
+                <div class="text-3xl font-bold text-blue-400">R$ 50M+</div>
+                <p class="text-sm opacity-80">Captados</p>
+            </div>
+            <div class="text-center">
+                <div class="text-3xl font-bold text-purple-400">2.000+</div>
+                <p class="text-sm opacity-80">Investidores</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- PROJETOS EM DESTAQUE -->
+<section id="projetos" class="py-20">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h2 class="text-3xl font-bold text-center mb-12">Projetos em Destaque</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            
+            <!-- Projeto 1 -->
+            <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-shadow">
+                <div class="h-48 bg-gradient-to-br from-blue-400 to-blue-600"></div>
+                <div class="p-6">
+                    <div class="flex items-center justify-between mb-2">
+                        <h3 class="text-xl font-bold">Galpão Industrial SP</h3>
+                        <span class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-semibold">Baixo Risco</span>
+                    </div>
+                    <p class="text-gray-600 mb-4">São Paulo - SP • Galpão logístico estratégico</p>
+                    <div class="space-y-3">
+                        <div class="flex justify-between">
+                            <span class="text-sm text-gray-600">Rentabilidade:</span>
+                            <span class="font-semibold text-green-600">12.5% a.a.</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-sm text-gray-600">Prazo:</span>
+                            <span class="font-semibold">24 meses</span>
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-sm mb-1">
+                                <span>Captação</span>
+                                <span>75%</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2">
+                                <div class="bg-blue-600 h-2 rounded-full" style="width: 75%"></div>
+                            </div>
+                        </div>
+                        <button onclick="abrirLogin()" class="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                            Investir Agora
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Projeto 2 -->
+            <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-shadow">
+                <div class="h-48 bg-gradient-to-br from-purple-400 to-purple-600"></div>
+                <div class="p-6">
+                    <div class="flex items-center justify-between mb-2">
+                        <h3 class="text-xl font-bold">Fábrica Recife</h3>
+                        <span class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs font-semibold">Médio Risco</span>
+                    </div>
+                    <p class="text-gray-600 mb-4">Recife - PE • Fábrica de produtos químicos</p>
+                    <div class="space-y-3">
+                        <div class="flex justify-between">
+                            <span class="text-sm text-gray-600">Rentabilidade:</span>
+                            <span class="font-semibold text-green-600">15.0% a.a.</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-sm text-gray-600">Prazo:</span>
+                            <span class="font-semibold">36 meses</span>
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-sm mb-1">
+                                <span>Captação</span>
+                                <span>45%</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2">
+                                <div class="bg-purple-600 h-2 rounded-full" style="width: 45%"></div>
+                            </div>
+                        </div>
+                        <button onclick="abrirLogin()" class="w-full bg-purple-600 text-white py-2 rounded-lg hover:bg-purple-700 transition-colors">
+                            Investir Agora
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Projeto 3 -->
+            <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-shadow">
+                <div class="h-48 bg-gradient-to-br from-green-400 to-green-600"></div>
+                <div class="p-6">
+                    <div class="flex items-center justify-between mb-2">
+                        <h3 class="text-xl font-bold">Armazém Rio</h3>
+                        <span class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-semibold">Baixo Risco</span>
+                    </div>
+                    <p class="text-gray-600 mb-4">Rio de Janeiro - RJ • Centro de distribuição</p>
+                    <div class="space-y-3">
+                        <div class="flex justify-between">
+                            <span class="text-sm text-gray-600">Rentabilidade:</span>
+                            <span class="font-semibold text-green-600">10.0% a.a.</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-sm text-gray-600">Prazo:</span>
+                            <span class="font-semibold">18 meses</span>
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-sm mb-1">
+                                <span>Captação</span>
+                                <span>90%</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2">
+                                <div class="bg-green-600 h-2 rounded-full" style="width: 90%"></div>
+                            </div>
+                        </div>
+                        <button onclick="abrirLogin()" class="w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition-colors">
+                            Investir Agora
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- COMO FUNCIONA -->
+<section id="como-funciona" class="py-20 bg-gray-100">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h2 class="text-3xl font-bold text-center mb-12">Como Funciona</h2>
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div class="text-center">
+                <div class="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <span class="text-2xl font-bold text-blue-600">1</span>
+                </div>
+                <h3 class="font-semibold mb-2">Cadastre-se</h3>
+                <p class="text-sm text-gray-600">Processo 100% digital e seguro</p>
+            </div>
+            <div class="text-center">
+                <div class="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <span class="text-2xl font-bold text-green-600">2</span>
+                </div>
+                <h3 class="font-semibold mb-2">IA Analisa</h3>
+                <p class="text-sm text-gray-600">Sugere os melhores projetos</p>
+            </div>
+            <div class="text-center">
+                <div class="bg-purple-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <span class="text-2xl font-bold text-purple-600">3</span>
+                </div>
+                <h3 class="font-semibold mb-2">Invista via PIX</h3>
+                <p class="text-sm text-gray-600">Transfira e pronto!</p>
+            </div>
+            <div class="text-center">
+                <div class="bg-yellow-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <span class="text-2xl font-bold text-yellow-600">4</span>
+                </div>
+                <h3 class="font-semibold mb-2">Receba Dividendos</h3>
+                <p class="text-sm text-gray-600">Renda passiva garantida</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- LOGIN MODAL -->
+<div id="loginModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-lg p-8 max-w-md w-full">
+        <h2 class="text-2xl font-bold mb-4">Entrar</h2>
+        <form onsubmit="fazerLogin(event)">
+            <input type="email" id="email" placeholder="Email" required class="w-full p-2 border rounded mb-4">
+            <input type="password" id="senha" placeholder="Senha" required class="w-full p-2 border rounded mb-4">
+            <div class="flex items-center mb-4">
+                <input type="checkbox" id="lembrar" class="mr-2">
+                <label for="lembrar" class="text-sm">Lembrar de mim</label>
+            </div>
+            <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700">
+                Entrar
+            </button>
+        </form>
+        
+        <div class="mt-4">
+            <p class="text-sm text-gray-600 mb-2">Usuários de teste:</p>
+            <button onclick="preencherLogin('bronze@teste.com')" class="block w-full text-left p-2 text-sm bg-gray-100 rounded mb-1">
+                Bronze: bronze@teste.com / 123456
+            </button>
+            <button onclick="preencherLogin('silver@teste.com')" class="block w-full text-left p-2 text-sm bg-gray-100 rounded mb-1">
+                Silver: silver@teste.com / 123456
+            </button>
+            <button onclick="preencherLogin('gold@teste.com')" class="block w-full text-left p-2 text-sm bg-gray-100 rounded">
+                Gold: gold@teste.com / 123456
+            </button>
+        </div>
+        
+        <button onclick="fecharLogin()" class="mt-4 text-sm text-gray-600">Fechar</button>
+    </div>
+</div>
+
+<!-- SIMULADOR DE INVESTIMENTO -->
+<section class="py-20">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h2 class="text-3xl font-bold text-center mb-12">Simule seu Investimento</h2>
+        <div class="bg-white rounded-lg shadow-lg p-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div>
+                    <label class="block text-sm font-medium mb-2">Valor a Investir</label>
+                    <input type="range" id="valorInvestimento" min="1000" max="50000" value="10000" class="w-full mb-4" oninput="atualizarSimulacao()">
+                    <p class="text-2xl font-bold text-blue-600">R$ <span id="valorDisplay">10.000</span></p>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-2">Projeção em 24 meses</label>
+                    <p class="text-3xl font-bold text-green-600">+ R$ <span id="lucroDisplay">2.500</span></p>
+                    <p class="text-sm text-gray-600">Total: R$ <span id="totalDisplay">12.500</span></p>
+                </div>
+            </div>
+            <button onclick="abrirLogin()" class="w-full mt-6 bg-green-600 text-white py-3 rounded-lg hover:bg-green-700">
+                Quero Investir Agora
+            </button>
+        </div>
+    </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="bg-gray-900 text-white py-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div>
+                <h3 class="text-xl font-bold mb-4">InvistaTop</h3>
+                <p class="text-gray-400">Investimentos imobiliários industriais com tecnologia de ponta.</p>
+            </div>
+            <div>
+                <h4 class="font-semibold mb-4">Links Rápidos</h4>
+                <ul class="space-y-2 text-gray-400">
+                    <li><a href="#projetos" class="hover:text-white">Projetos</a></li>
+                    <li><a href="#como-funciona" class="hover:text-white">Como Funciona</a></li>
+                    <li><a href="#" class="hover:text-white">FAQ</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="font-semibold mb-4">Contato</h4>
+                <ul class="space-y-2 text-gray-400">
+                    <li>contato@invistatop.com</li>
+                    <li>(11) 9999-9999</li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="font-semibold mb-4">Newsletter</h4>
+                <input type="email" placeholder="Seu email" class="w-full p-2 rounded bg-gray-800 border border-gray-700">
+                <button class="w-full mt-2 bg-blue-600 text-white py-2 rounded hover:bg-blue-700">
+                    Assinar
+                </button>
+            </div>
+        </div>
+        <div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
+            <p>&copy; 2024 InvistaTop. Todos os direitos reservados.</p>
+        </div>
+    </div>
+</footer>
+
+<script>
+// Funções JavaScript
+function abrirLogin() {
+    document.getElementById('loginModal').classList.remove('hidden');
+}
+
+function fecharLogin() {
+    document.getElementById('loginModal').classList.add('hidden');
+}
+
+function preencherLogin(email) {
+    document.getElementById('email').value = email;
+    document.getElementById('senha').value = '123456';
+}
+
+function fazerLogin(event) {
+    event.preventDefault();
+    const email = document.getElementById('email').value;
+    const senha = document.getElementById('senha').value;
+    
+    const usuarios = {
+        'bronze@teste.com': { nivel: 'Bronze', nome: 'Usuário Bronze' },
+        'silver@teste.com': { nivel: 'Silver', nome: 'Usuário Silver' },
+        'gold@teste.com': { nivel: 'Gold', nome: 'Usuário Gold' }
+    };
+    
+    if (usuarios[email] && senha === '123456') {
+        localStorage.setItem('usuario', JSON.stringify({ email, ...usuarios[email] }));
+        alert(`Bem-vindo ${usuarios[email].nome}! Você será redirecionado para o dashboard.`);
+        // Em produção: window.location.href = '/dashboard';
+    } else {
+        alert('Email ou senha inválidos!');
+    }
+}
+
+function abrirCadastro() {
+    document.getElementById('loginModal').classList.remove('hidden');
+}
+
+function scrollToProjetos() {
+    document.getElementById('projetos').scrollIntoView({ behavior: 'smooth' });
+}
+
+function atualizarSimulacao() {
+    const valor = document.getElementById('valorInvestimento').value;
+    const lucro = Math.round(valor * 0.25);
+    const total = parseInt(valor) + lucro;
+    
+    document.getElementById('valorDisplay').textContent = parseInt(valor).toLocaleString();
+    document.getElementById('lucroDisplay').textContent = lucro.toLocaleString();
+    document.getElementById('totalDisplay').textContent = total.toLocaleString();
+}
+
+// Atualizar simulação ao carregar
+atualizarSimulacao();
+
+// Fechar modal ao clicar fora
+document.getElementById('loginModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        fecharLogin();
+    }
+});
+</script>
+
+</body>
+</html>
