@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - InvistaTop</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .sidebar { transition: all 0.3s ease; }
+        .active { background-color: #1B4EFF; color: white; }
+    </style>
+</head>
+<body class="bg-gray-50">
+
+<!-- Header Mobile -->
+<div class="lg:hidden bg-white shadow-md p-4 flex justify-between items-center">
+    <h1 class="text-xl font-bold text-blue-600">InvistaTop</h1>
+    <button onclick="toggleSidebar()" class="text-gray-600">
+        <i class="fas fa-bars text-xl"></i>
+    </button>
+</div>
+
+<div class="flex h-screen">
+    <!-- Sidebar -->
+    <aside id="sidebar" class="sidebar w-64 bg-white shadow-lg fixed lg:relative h-full z-40 transform -translate-x-full lg:translate-x-0">
+        <div class="p-4">
+            <h2 class="text-xl font-bold text-blue-600 mb-6">InvistaTop</h2>
+            <nav class="space-y-2">
+                <a href="#" class="active nav-item block px-4 py-3 rounded-lg" onclick="mudarPagina('inicio')">
+                    <i class="fas fa-home mr-3"></i>Início
+                </a>
+                <a href="#" class="nav-item block px-4 py-3 rounded-lg hover:bg-blue-50" onclick="mudarPagina('carteira')">
+                    <i class="fas fa-wallet mr-3"></i>Portfólio
+                </a>
+                <a href="#" class="nav-item block px-4 py-3 rounded-lg hover:bg-blue-50" onclick="mudarPagina('projetos')">
+                    <i class="fas fa-building mr-3"></i>Projetos Iniciados
+                </a>
+                <a href="#" class="nav-item block px-4 py-3 rounded-lg hover:bg-blue-50" onclick="mudarPagina('aguardando')">
+                    <i class="fas fa-clock mr-3"></i>Aguardando
+                </a>
+                <a href="#" class="nav-item block px-4 py-3 rounded-lg hover:bg-blue-50" onclick="mudarPagina('financeiro')">
+                    <i class="fas fa-dollar-sign mr-3"></i>Financeiro
+                </a>
+                <a href="#" class="nav-item block px-4 py-3 rounded-lg hover:bg-blue-50" onclick="mudarPagina('indicar')">
+                    <i class="fas fa-gift mr-3"></i>Indique e Ganhe
+                </a>
+                <a href="#" class="nav-item block px-4 py-3 rounded-lg hover:bg-blue-50" onclick="mudarPagina('conta')">
+                    <i class="fas fa-user mr-3"></i>Minha Conta
+                </a>
+                <a href="#" class="nav-item block px-4 py-3 rounded-lg hover:bg-blue-50" onclick="mudarPagina('mensagens')">
+                    <i class="fas fa-envelope mr-3"></i>Mensagens
+                </a>
+            </nav>
+        </div>
+        <div class="absolute bottom-0 w-full p-4 border-t">
+            <div class="flex items-center">
+                <div class="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold">
+                    <span id="userInitial">U</span>
+                </div>
+                <div class="ml-3">
+                    <p id="userName" class="font-semibold text-sm">Usuário</p>
+                    <p id="userLevel" class="text-xs text-gray-500">Bronze</p>
+                </div>
+            </div>
+            <button onclick="logout()" class="w-full mt-2 text-red-600 text-sm">
+                <i class="fas fa-sign-out-alt mr-2"></i>Sair
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 overflow-auto">
+        <div id="conteudo" class="p-6 lg:p-8">
+            <!-- Conteúdo dinâmico será carregado aqui -->
+        </div>
+    </main>
+</div>
+
+<!-- Overlay para mobile -->
+<div id="overlay" class="fixed inset-0 bg-black bg-opacity-50 z-30 hidden lg:hidden" onclick="toggleSidebar()"></div>
+
+<script>
+// Verificar login
+if (!localStorage.getItem('usuario')) {
+    window.location.href = 'index.html';
+}
+
+// Dados do usuário
+const usuario = JSON.parse(localStorage.getItem('usuario'));
+document.getElementById('userName').textContent = usuario.nome;
+document.getElementById('userLevel').textContent = usuario.nivel;
+document.getElementById('userInitial').textContent = usuario.nome.charAt(0);
+
+// Dados mockados
+const investimentos = [
+    { nome: 'Galpão Industrial SP', valor: 5000, lucro: 625, status: 'Ativo', risco: 'Baixo' },
+    { nome: 'Fábrica Recife', valor: 3000, lucro: 450, status: 'Ativo', risco: 'Médio' },
+    { nome: 'Armazém Rio', valor: 2000, lucro: 200, status: 'Concluído', risco: 'Baixo' }
+];
+
+const projetosDisponiveis = [
+    { nome: 'Galpão Logístico MG', localizacao: 'Belo Horizonte - MG', rentabilidade: 13.5, prazo: 30, risco: 'Baixo', captacao: 60 },
+    { nome: 'Indústria Química RS', localizacao: 'Porto Alegre - RS', rentabilidade: 16.0, prazo: 36, risco: 'Médio', captacao: 35 },
+    { nome: 'Centro Distribuição DF', localizacao: 'Brasília - DF', rentabilidade: 11.8, prazo: 24, risco: 'Baixo', captacao: 85 }
+];
+
+function toggleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('overlay');
+    sidebar.classList.toggle('-translate-x-full');
+    overlay.classList.toggle('hidden');
+}
+
+function mudarPagina(pagina) {
+    // Atualizar nav
+    document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+    event.target.classList.add('active');
+    
+    // Carregar conteúdo
+    switch(pagina) {
+        case 'inicio':
+            carregarInicio();
+            break;
+        case 'carteira':
+            carregarCarteira();
+            break;
+        case 'projetos':
+            carregarProjetos();
+            break;
+        case 'financeiro':
+            carregarFinanceiro();
+            break;
+        case 'indicar':
+            carregarIndicar();
+            break;
+        default:
+            carregarInicio();
+    }
+    
+    // Fechar sidebar no mobile
+    if (window.innerWidth < 1024) {
+        toggleSidebar();
+    }
+}
+
+function carregarInicio() {
+    const totalInvestido = investimentos.reduce((sum, inv) => sum + inv.valor, 0);
+    const totalLucro = investimentos.reduce((sum, inv) => sum + inv.lucro, 0);
+    
+    document.getElementById('conteudo').innerHTML = `
+        <h1 class="text-2xl font-bold mb-6">Dashboard</h1>
+        
+        <!-- Cards de Visão Geral -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="bg-white p-6 rounded-lg shadow">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-gray-600">Saldo Disponível</p>
+                        <p class="text-2xl font-bold">R$ 1.234,56</p>
+                    </div>
+                    <i class="fas fa-dollar-sign text-green-500 text-2xl"></i>
+                </div>
+            </div>
+            
+            <div class="bg-white p-6 rounded-lg shadow">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-gray-600">Total Investido</p>
+                        <p class="text-2xl font-bold">R$ ${totalInvestido.toLocaleString()}</p>
+                    </div>
+                    <i class="fas fa-chart-line text-blue-500 text-2xl"></i>
+                </div>
+            </div>
+            
+            <div class="bg-white p-6 rounded-lg shadow">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-gray-600">Rendimentos Totais</p>
+                        <p class="text-2xl font-bold text-green-600">R$ ${totalLucro.toLocaleString()}</p>
+                    </div>
+                    <div class="text-2xl">${usuario.nivel === 'Gold' ? '🥇' : usuario.nivel === 'Silver' ? '🥈' : '🥉'}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Investimentos Ativos -->
+        <div class="bg-white rounded-lg shadow p-6 mb-6">
+            <h3 class="text-lg font-semibold mb-4">Meus Investimentos</h3>
+            <div class="space-y-4">
+                ${investimentos.map(inv => `
+                    <div class="border rounded-lg p-4">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h4 class="font-semibold">${inv.nome}</h4>
+                                <p class="text-sm text-gray-600">Status: ${inv.status} | Risco: ${inv.risco}</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="font-semibold">R$ ${inv.valor.toLocaleString()}</p>
+                                <p class="text-sm text-green-600">+ R$ ${inv.lucro.toLocaleString()}</p>
+                            </div>
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+
+        <!-- Gráfico Simples -->
+        <div class="bg-white rounded-lg shadow p-6">
+            <h3 class="text-lg font-semibold mb-4">Evolução dos Rendimentos</h3>
+            <div class="h-64 bg-gray-100 rounded-lg flex items-center justify-center">
+                <p class="text-gray-500">Gráfico de evolução será implementado</p>
+            </div>
+        </div>
+    `;
+}
+
+function carregarCarteira() {
+    document.getElementById('conteudo').innerHTML = `
+        <h1 class="text-2xl font-bold mb-6">Meu Portfólio</h1>
+        
+        <!-- Resumo -->
+        <div class="bg-white rounded-lg shadow p-6 mb-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
+                <div>
+                    <p class="text-2xl font-bold text-blue-600">3</p>
+                    <p class="text-sm text-gray-600">Investimentos Ativos</p>
+                </div>
+                <div>
+                    <p class="text-2xl font-bold text-green-600">12.5%</p>
+                    <p class="text-sm text-gray-600">Rentabilidade Média</p>
+                </div>
+                <div>
+                    <p class="text-2xl font-bold text-purple-600">85%</p>
+                    <p class="text-sm text-gray-600">Diversificação</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lista de Investimentos -->
+        <div class="bg-white rounded-lg shadow">
+            <div class="p-6 border-b">
+                <h3 class="text-lg font-semibold">Detalhes dos Investimentos</h3>
+            </div>
+            <div class="divide-y">
+                ${investimentos.map(inv => `
+                    <div class="p-6">
+                        <div class="flex justify-between items-start">
+                            <div class="flex-1">
+                                <h4 class="font-semibold text-lg">${inv.nome}</h4>
+                                <p class="text-sm text-gray-600 mb-2">Status: ${inv.status}</p>
+                                <div class="flex gap-4 text-sm">
+                                    <span class="bg-gray-100 px-2 py-1 rounded">Risco: ${inv.risco}</span>
+                                    <span class="bg-blue-100 px-2 py-1 rounded text-blue-800">Ativo</span>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-xl font-bold">R$ ${inv.valor.toLocaleString()}</p>
+                                <p class="text-sm text-green-600">Lucro: R$ ${inv.lucro.toLocaleString()}</p>
+                                <p class="text-sm text-gray-500 mt-1">ROI: ${((inv.lucro/inv.valor)*100).toFixed(1)}%</p>
+                            </div>
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+    `;
+}
+
+function carregarProjetos() {
+    document.getElementById('conteudo').innerHTML = `
+        <h1 class="text-2xl font-bold mb-6">Projetos Disponíveis</h1>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            ${projetosDisponiveis.map(projeto => `
+                <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+                    <div class="h-48 bg-gradient-to-br from-blue-400 to-blue-600"></div>
+                    <div class="p-6">
+                        <div class="flex items-center justify-between mb-2">
+                            <h3 class="text-xl font-bold">${projeto.nome}</h3>
+                            <span class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-semibold">${projeto.risco} Risco</span>
+                        </div>
+                        <p class="text-gray-600 mb-4">${projeto.localizacao}</p>
+                        
+                        <div class="space-y-3">
+                            <div class="flex justify-between">
+                                <span class="text-sm text-gray-600">Rentabilidade:</span>
+                                <span class="font-semibold text-green-600">${projeto.rentabilidade}% a.a.</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-sm text-gray-600">Prazo:</span>
+                                <span class="font-semibold">${projeto.prazo} meses</span>
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-sm mb-1">
+                                    <span>Captação</span>
+                                    <span>${projeto.captacao}%</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-2">
+                                    <div class="bg-blue-600 h-2 rounded-full" style="width: ${projeto.captacao}%"></div>
+                                </div>
+                            </div>
+                            
+                            <button onclick="investir('${projeto.nome}')" class="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                                Investir Agora
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('')}
+        </div>
+    `;
+}
+
+function carregarFinanceiro() {
+    document.getElementById('conteudo').innerHTML = `
+        <h1 class="text-2xl font-bold mb-6">Financeiro</h1>
+        
+        <!-- Saldo e Extrato -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Saldo -->
+            <div class="bg-white rounded-lg shadow p-6">
+                <h3 class="text-lg font-semibold mb-4">Saldo Disponível</h3>
+                <p class="text-3xl font-bold text-green-600 mb-4">R$ 1.234,56</p>
+                
+                <div class="space-y-3">
+                    <button class="w-full bg-green-600 text-white py-2 rounded hover:bg-green-700">
+                        <i class="fas fa-plus mr-2"></i>Depositar
+                    </button>
+                    <button class="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700">
+                        <i class="fas fa-minus mr-2"></i>Sacar
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Extrato -->
+            <div class="lg:col-span-2 bg-white rounded-lg shadow">
+                <div class="p-6 border-b">
+                    <h3 class="text-lg font-semibold">Extrato</h3>
+                </div>
+                <div class="divide-y">
+                    <div class="p-4 flex justify-between items-center">
+                        <div>
+                            <p class="font-semibold">Depósito PIX</p>
+                            <p class="text-sm text-gray-600">Hoje, 14:30</p>
+                        </div>
+                        <span class="text-green-600 font-semibold">+ R$ 1.000,00</span>
+                    </div>
+                    <div class="p-4 flex justify-between items-center">
+                        <div>
+                            <p class="font-semibold">Investimento - Galpão SP</p>
+                            <p class="text-sm text-gray-600">Ontem, 10:15</p>
+                        </div>
+                        <span class="text-red-600 font-semibold">- R$ 5.000,00</span>
+                    </div>
+                    <div class="p-4 flex justify-between items-center">
+                        <div>
+                            <p class="font-semibold">Dividendos - Fábrica PE</p>
+                            <p class="text-sm text-gray-600">15/07/2024</p>
+                        </div>
+                        <span class="text-green-600 font-semibold">+ R$ 187,50</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- PIX -->
+        <div class="bg-white rounded-lg shadow p-6 mt-6">
+            <h3 class="text-lg font-semibold mb-4">Configurar PIX</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium mb-2">Chave PIX</label>
+                    <input type="text" placeholder="CPF, email ou telefone" class="w-full p-2 border rounded">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-2">Banco</label>
+                    <select class="w-full p-2 border rounded">
+                        <option>Selecione seu banco</option>
+                        <option>Nubank</option>
+                        <option>Itaú</option>
+                        <option>Bradesco</option>
+                    </select>
+                </div>
+            </div>
+            <button class="mt-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+                Adicionar Chave PIX
+            </button>
+        </div>
+    `;
+}
+
+function carregarIndicar() {
+    const codigoIndicacao = 'INV' + Math.random().toString(36).substr(2, 8).toUpperCase();
+    
+    document.getElementById('conteudo').innerHTML = `
+        <h1 class="text-2xl font-bold mb-6">Indique e Ganhe</h1>
+        
+        <!-- Código de Indicação -->
+        <div class="bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg p-6 mb-6">
+            <h3 class="text-xl font-semibold mb-2">Seu Código de Indicação</h3>
+            <div class="bg-white/20 rounded-lg p-4 flex items-center justify-between">
+                <span id="codigo" class="text-2xl font-mono">${codigoIndicacao}</span>
+                <button onclick="copiarCodigo()" class="bg-white text-blue-600 px-4 py-2 rounded text-sm">
+                    <i class="fas fa-copy mr-2"></i>Copiar
+                </button>
+            </div>
+        </div>
+        
+        <!-- Estatísticas -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+            <div class="bg-white rounded-lg shadow p-6 text-center">
+                <p class="text-3xl font-bold text-blue-600">5</p>
+                <p class="text-gray-600">Indicações</p>
+            </div>
+            <div class="bg-white rounded-lg shadow p-6 text-center">
+                <p class="text-3xl font-bold text-green-600">3</p>
+                <p class="text-gray-600">Ativas</p>
+            </div>
+            <div class="bg-white rounded-lg shadow p-6 text-center">
+                <p class="text-3xl font-bold text-purple-600">R$ 450,00</p>
+                <p class="text-gray-600">Comissões</p>
+            </div>
+        </div>
+        
+        <!-- Lista de Indicações -->
+        <div class="bg-white rounded-lg shadow">
+            <div class="p-6 border-b">
+                <h3 class="text-lg font-semibold">Suas Indicações</h3>
+            </div>
+            <div class="divide-y">
+                <div class="p-4 flex justify-between items-center">
+                    <div>
+                        <p class="font-semibold">João Silva</p>
+                        <p class="text-sm text-gray-600">joao@email.com</p>
+                    </div>
+                    <span class="bg-green-100 text-green-800 px-2 py-1 rounded text-sm">Ativo</span>
+                </div>
+                <div class="p-4 flex justify-between items-center">
+                    <div>
+                        <p class="font-semibold">Maria Santos</p>
+                        <p class="text-sm text-gray-600">maria@email.com</p>
+                    </div>
+                    <span class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-sm">Pendente</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Compartilhar -->
+        <div class="bg-white rounded-lg shadow p-6 mt-6">
+            <h3 class="text-lg font-semibold mb-4">Compartilhar</h3>
+            <div class="flex gap-4">
+                <button class="flex-1 bg-blue-600 text-white py-2 rounded hover:bg-blue-700">
+                    <i class="fab fa-whatsapp mr-2"></i>WhatsApp
+                </button>
+                <button class="flex-1 bg-blue-500 text-white py-2 rounded hover:bg-blue-600">
+                    <i class="fab fa-facebook mr-2"></i>Facebook
+                </button>
+                <button class="flex-1 bg-sky-500 text-white py-2 rounded hover:bg-sky-600">
+                    <i class="fab fa-twitter mr-2"></i>Twitter
+                </button>
+            </div>
+        </div>
+    `;
+}
+
+function copiarCodigo() {
+    const codigo = document.getElementById('codigo').textContent;
+    navigator.clipboard.writeText(codigo);
+    alert('Código copiado: ' + codigo);
+}
+
+function investir(projeto) {
+    alert(`Funcionalidade de investimento em ${projeto} será implementada!`);
+}
+
+function logout() {
+    localStorage.removeItem('usuario');
+    window.location.href = 'index.html';
+}
+
+// Carregar página inicial ao abrir
+carregarInicio();
+</script>
+
+</body>
+</html>
