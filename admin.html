@@ -58,14 +58,14 @@ const supabase = supabase.createClient(
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJoaHlubGtzdHlyYWVtZ2tqaG9lIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTIzMTA5NTAsImV4cCI6MjA2Nzg4Njk1MH0.FnPMp882tTyKwka73jzsgfMfh0nGO4K5pyL34TJtUUQ'
 );
 
-// ===== ATUALIZAR BANCO =====
+
+  // ===== ATUALIZAR BANCO =====
 async function atualizarBanco() {
   const btn = event.target;
   btn.disabled = true;
   btn.textContent = 'Atualizando...';
 
   const sql = `
--- ✅ MIGRAÇÃO SEGURA INVISTATOP2 (preserva dados)
 CREATE TABLE IF NOT EXISTS niveis_usuario (
     id SERIAL PRIMARY KEY,
     nome VARCHAR(20) UNIQUE NOT NULL,
@@ -119,27 +119,36 @@ CREATE TABLE IF NOT EXISTS transacoes (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
-ALTER TABLE perfis ENABLE ROW LEVEL SECURITY;
-ALTER TABLE projetos ENABLE ROW LEVEL SECURITY;
-ALTER TABLE investimentos ENABLE ROW LEVEL SECURITY;
-ALTER TABLE transacoes ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "Usuários veem próprio perfil" ON perfis FOR SELECT USING (auth.uid() = id);
-CREATE POLICY "Projetos visíveis para todos" ON projetos FOR SELECT USING (true);
-CREATE POLICY "Usuários veem próprios dados" ON investimentos FOR ALL USING (auth.uid() = usuario_id);
+-- Políticas RLS (se não existirem)
+DO $$ BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'Usuários veem próprio perfil') THEN
+    ALTER TABLE perfis ENABLE ROW LEVEL SECURITY;
+    CREATE POLICY "Usuários veem próprio perfil" ON perfis FOR SELECT USING (auth.uid() = id);
+  END IF;
+END $$;
 `;
 
   try {
-    const { error } = await supabase.rpc('exec_sql', { sql });
-    if (error) throw error;
-    document.getElementById('bd-result').innerHTML = '<span class="text-green-600">✅ Banco atualizado!</span>';
+    const response = await fetch('https://bhhynlkstyraemgkjhoe.supabase.co/rest/v1/rpc/exec_sql', {
+      method: 'POST',
+      headers: {
+        'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJoaHlubGtzdHlyYWVtZ2tqaG9lIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTIzMTA5NTAsImV4cCI6MjA2Nzg4Njk1MH0.FnPMp882tTyKwka73jzsgfMfh0nGO4K5pyL34TJtUUQ',
+        'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJoaHlubGtzdHlyYWVtZ2tqaG9lIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTIzMTA5NTAsImV4cCI6MjA2Nzg4Njk1MH0.FnPMp882tTyKwka73jzsgfMfh0nGO4K5pyL34TJtUUQ',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ sql })
+    });
+
+    if (!response.ok) throw new Error(await response.text());
+    document.getElementById('bd-result').innerHTML = '<span class="text-green-600">✅ Banco atualizado com sucesso!</span>';
   } catch (err) {
-    document.getElementById('bd-result').innerHTML = `<span class="text-red-600">❌ ${err.message}</span>`;
+    document.getElementById('bd-result').innerHTML = `<span class="text-red-600">❌ Erro: ${err.message}</span>`;
   } finally {
     btn.disabled = false;
     btn.textContent = '🔄 Atualizar Banco';
   }
 }
+
 
 // ===== UPLOAD GITHUB =====
 async function uploadGitHub() {
