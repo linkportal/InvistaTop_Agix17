@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>InvistaTop - Investimentos Imobiliários Inteligentes</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>body { font-family: 'Inter', sans-serif; }</style>
+</head>
+<body class="bg-gray-50">
+
+<!-- Navbar -->
+<nav class="bg-white shadow-lg sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4">
+        <div class="flex justify-between items-center h-16">
+            <span class="text-2xl font-bold text-blue-600">InvistaTop</span>
+            <div class="hidden md:block space-x-4">
+                <button onclick="scrollToProjetos()" class="text-gray-700 hover:text-blue-600">Projetos</button>
+                <button onclick="scrollToComoFunciona()" class="text-gray-700 hover:text-blue-600">Como Funciona</button>
+                <button onclick="abrirAuth('login')" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Entrar</button>
+            </div>
+            <button class="md:hidden" onclick="toggleMobileMenu()">
+                <i class="fas fa-bars text-xl"></i>
+            </button>
+        </div>
+    </div>
+</nav>
+
+<!-- Hero -->
+<section class="bg-gradient-to-r from-blue-600 to-blue-800 text-white py-20">
+    <div class="max-w-7xl mx-auto px-4 text-center">
+        <h1 class="text-5xl font-bold mb-6">
+            Invista em Imóveis Industriais com 
+            <span class="bg-gradient-to-r from-green-400 to-blue-400 bg-clip-text text-transparent">Inteligência</span>
+        </h1>
+        <p class="text-xl mb-8 max-w-2xl mx-auto">Rentabilidade acima do mercado com segurança de investimentos imobiliários industriais</p>
+        <div class="flex gap-4 justify-center">
+            <button onclick="abrirAuth('cadastro')" class="bg-green-500 hover:bg-green-600 px-8 py-3 rounded-lg font-semibold">Começar Agora</button>
+            <button onclick="scrollToProjetos()" class="border border-white px-8 py-3 rounded-lg font-semibold hover:bg-white/10">Ver Projetos</button>
+        </div>
+    </div>
+</section>
+
+<!-- Projetos -->
+<section id="projetos" class="py-20">
+    <div class="max-w-7xl mx-auto px-4">
+        <h2 class="text-3xl font-bold text-center mb-12">Projetos em Destaque</h2>
+        <div id="projetos-container" class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <!-- Carregado via JS -->
+        </div>
+    </div>
+</section>
+
+<!-- Como Funciona -->
+<section id="como-funciona" class="py-20 bg-gray-100">
+    <div class="max-w-7xl mx-auto px-4">
+        <h2 class="text-3xl font-bold text-center mb-12">Como Funciona</h2>
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div class="text-center">
+                <div class="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <span class="text-2xl font-bold text-blue-600">1</span>
+                </div>
+                <h3 class="font-semibold mb-2">Cadastre-se</h3>
+                <p class="text-sm text-gray-600">100% digital e seguro</p>
+            </div>
+            <!-- ... outros passos ... -->
+        </div>
+    </div>
+</section>
+
+<!-- Modal Auth -->
+<div id="authModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-lg p-8 max-w-md w-full">
+        <div class="flex justify-between items-center mb-4">
+            <h2 id="authTitle" class="text-2xl font-bold">Entrar</h2>
+            <button onclick="fecharAuth()" class="text-gray-500 hover:text-gray-700">&times;</button>
+        </div>
+        
+        <form id="authForm" onsubmit="handleAuth(event)">
+            <input type="email" id="authEmail" placeholder="Email" required class="w-full p-2 border rounded mb-4">
+            <input type="password" id="authPassword" placeholder="Senha" required class="w-full p-2 border rounded mb-4">
+            <input type="text" id="authName" placeholder="Nome completo" class="w-full p-2 border rounded mb-4 hidden">
+            
+            <button type="submit" id="authSubmit" class="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700">
+                Entrar
+            </button>
+        </form>
+        
+        <p class="text-center mt-4">
+            <a id="authToggle" onclick="toggleAuthMode()" class="text-blue-600 cursor-pointer">Criar conta</a>
+        </p>
+        
+        <div class="mt-4 text-center">
+            <p class="text-sm text-gray-600 mb-2">Teste rápido:</p>
+            <button onclick="loginTeste('bronze@teste.com')" class="text-xs bg-gray-100 px-2 py-1 rounded mr-2">Bronze</button>
+            <button onclick="loginTeste('silver@teste.com')" class="text-xs bg-gray-100 px-2 py-1 rounded mr-2">Silver</button>
+            <button onclick="loginTeste('gold@teste.com')" class="text-xs bg-gray-100 px-2 py-1 rounded">Gold</button>
+        </div>
+    </div>
+</div>
+
+<script>
+// Config Supabase
+const supabaseUrl = 'https://bhhynlkstyraemgkjhoe.supabase.co';
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJoaHlubGtzdHlyYWVtZ2tqaG9lIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTIzMTA5NTAsImV4cCI6MjA2Nzg4Njk1MH0.FnPMp882tTyKwka73jzsgfMfh0nGO4K5pyL34TJtUUQ';
+const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+
+// Variáveis globais
+let authMode = 'login';
+const senhasTeste = {
+    'bronze@teste.com': '123456',
+    'silver@teste.com': '123456',
+    'gold@teste.com': '123456'
+};
+
+// Funções de autenticação
+async function handleAuth(e) {
+    e.preventDefault();
+    const email = document.getElementById('authEmail').value;
+    const password = document.getElementById('authPassword').value;
+    const name = document.getElementById('authName').value;
+
+    try {
+        let result;
+        if (authMode === 'login') {
+            result = await supabase.auth.signInWithPassword({ email, password });
+        } else {
+            result = await supabase.auth.signUp({ 
+                email, 
+                password,
+                options: { data: { nome: name } }
+            });
+        }
+
+        if (result.error) throw result.error;
+        
+        // Criar perfil se for novo usuário
+        if (authMode === 'cadastro') {
+            await supabase.from('perfis').insert([{ id: result.data.user.id, nome: name }]);
+        }
+        
+        localStorage.setItem('user', JSON.stringify(result.data.user));
+        window.location.href = 'dashboard.html';
+    } catch (error) {
+        alert(error.message);
+    }
+}
+
+// Funções de UI
+function abrirAuth(mode) {
+    authMode = mode;
+    document.getElementById('authModal').classList.remove('hidden');
+    document.getElementById('authTitle').textContent = mode === 'login' ? 'Entrar' : 'Criar Conta';
+    document.getElementById('authSubmit').textContent = mode === 'login' ? 'Entrar' : 'Cadastrar';
+    document.getElementById('authName').classList.toggle('hidden', mode === 'login');
+    document.getElementById('authToggle').innerHTML = mode === 'login' ? 
+        'Não tem conta? <span class="text-blue-600 cursor-pointer">Criar conta</span>' : 
+        'Já tem conta? <span class="text-blue-600 cursor-pointer">Entrar</span>';
+}
+
+async function loginTeste(email) {
+    const password = senhasTeste[email];
+    if (!password) return;
+    
+    document.getElementById('authEmail').value = email;
+    document.getElementById('authPassword').value = password;
+    document.getElementById('authForm').requestSubmit();
+}
+
+// Carregar projetos na landing
+async function carregarProjetosLanding() {
+    const { data, error } = await supabase.from('projetos').select('*').eq('status', 'Ativo');
+    if (error) return;
+    
+    const container = document.getElementById('projetos-container');
+    container.innerHTML = data.map(projeto => `
+        <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-shadow">
+            <div class="h-48 bg-gradient-to-br from-blue-400 to-blue-600"></div>
+            <div class="p-6">
+                <div class="flex justify-between items-start mb-2">
+                    <h3 class="text-xl font-bold">${projeto.nome}</h3>
+                    <span class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-semibold">${projeto.risco} Risco</span>
+                </div>
+                <p class="text-gray-600 mb-4">${projeto.localizacao}</p>
+                <div class="space-y-3">
+                    <div class="flex justify-between">
+                        <span class="text-sm text-gray-600">Rentabilidade:</span>
+                        <span class="font-semibold text-green-600">${projeto.rentabilidade}% a.a.</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-sm text-gray-600">Prazo:</span>
+                        <span class="font-semibold">${projeto.tempo_investimento} meses</span>
+                    </div>
+                    <div>
+                        <div class="flex justify-between text-sm mb-1">
+                            <span>Captação</span>
+                            <span>${Math.round((projeto.valor_captado/projeto.valor_total)*100)}%</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="bg-blue-600 h-2 rounded-full" style="width: ${(projeto.valor_captado/projeto.valor_total)*100}%"></div>
+                        </div>
+                    </div>
+                    <button onclick="abrirAuth('login')" class="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700">
+                        Investir Agora
+                    </button>
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
+
+// Inicialização
+document.addEventListener('DOMContentLoaded', () => {
+    carregarProjetosLanding();
+});
+
+// Navegação
+function scrollToProjetos() { document.getElementById('projetos').scrollIntoView({behavior: 'smooth'}); }
+function scrollToComoFunciona() { document.getElementById('como-funciona').scrollIntoView({behavior: 'smooth'}); }
+function fecharAuth() { document.getElementById('authModal').classList.add('hidden'); }
+function toggleAuthMode() { abrirAuth(authMode === 'login' ? 'cadastro' : 'login'); }
+</script>
+
+</body>
+</html>
