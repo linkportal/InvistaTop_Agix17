@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - InvistaTop</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-gray-50">
+
+<div class="flex h-screen">
+    <!-- Sidebar -->
+    <aside class="w-64 bg-gray-900 text-white">
+        <div class="p-4">
+            <h2 class="text-xl font-bold mb-6">Admin InvistaTop</h2>
+            <nav class="space-y-2">
+                <button onclick="mudirPaginaAdmin('dashboard')" class="active nav-item w-full text-left px-4 py-3 rounded-lg flex items-center bg-blue-600">
+                    <i class="fas fa-chart-bar mr-3"></i>Dashboard
+                </button>
+                <button onclick="mudirPaginaAdmin('usuarios')" class="nav-item w-full text-left px-4 py-3 rounded-lg flex items-center hover:bg-gray-800">
+                    <i class="fas fa-users mr-3"></i>Usuários
+                </button>
+                <button onclick="mudirPaginaAdmin('projetos')" class="nav-item w-full text-left px-4 py-3 rounded-lg flex items-center hover:bg-gray-800">
+                    <i class="fas fa-building mr-3"></i>Projetos
+                </button>
+                <button onclick="mudirPaginaAdmin('transacoes')" class="nav-item w-full text-left px-4 py-3 rounded-lg flex items-center hover:bg-gray-800">
+                    <i class="fas fa-exchange-alt mr-3"></i>Transações
+                </button>
+            </nav>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 overflow-auto">
+        <div id="conteudoAdmin" class="p-8">
+            <!-- Conteúdo dinâmico -->
+        </div>
+    </main>
+</div>
+
+<script>
+// Configuração Supabase Admin
+const supabaseUrl = 'https://bhhynlkstyraemgkjhoe.supabase.co';
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJoaHlubGtzdHlyYWVtZ2tqaG9lIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTIzMTA5NTAsImV4cCI6MjA2Nzg4Njk1MH0.FnPMp882tTyKwka73jzsgfMfh0nGO4K5pyL34TJtUUQ';
+const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+
+// Verificar admin
+async function checkAdmin() {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+        window.location.href = 'index.html';
+        return;
+    }
+    
+    // Verificar se é admin (simplificado)
+    if (user.email !== 'admin@invistatop.com') {
+        window.location.href = 'dashboard.html';
+        return;
+    }
+}
+
+// Dashboard Admin
+async function mudirPaginaAdmin(pagina) {
+    document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active', 'bg-blue-600'));
+    event.target.classList.add('active', 'bg-blue-600');
+    
+    switch(pagina) {
+        case 'dashboard': carregarDashboardAdmin(); break;
+        case 'usuarios': carregarUsuariosAdmin(); break;
+        case 'projetos': carregarProjetosAdmin(); break;
+        case 'transacoes': carregarTransacoesAdmin(); break;
+    }
+}
+
+// Dashboard com métricas
+async function carregarDashboardAdmin() {
+    const [usuarios, projetos, transacoes] = await Promise.all([
+        supabase.from('perfis').select('*, niveis_usuario(*)'),
+        supabase.from('projetos').select('*'),
+        supabase.from('transacoes').select('*')
+    ]);
+    
+    const totalUsuarios = usuarios.data?.length || 0;
+    const totalCaptado = projetos.data?.reduce((sum, p) => sum + p.valor_captado, 0) || 0;
+    const totalTransacoes = transacoes.data?.length || 0;
+    
+    document.getElementById('conteudoAdmin').innerHTML = `
+        <h1 class="text-2xl font-bold mb-6">Dashboard Administrativo</h1>
+        
+        <!-- Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div class="bg-white p-6 rounded-lg shadow">
+                <div class="flex justify-between">
+                    <div>
+                        <p class="text-sm text-gray-600">Total Usuários</p>
+                        <p class="text-2xl font-bold">${totalUsuarios}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow">
+                <div class="flex justify-between">
+                    <div>
+                        <p class="text-sm text-gray-600">Total Captado</p>
+                        <p class="text-2xl font-bold">R$ ${(totalCaptado/1000000).toFixed(1)}M</p>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow">
+                <div class="flex justify-between">
+                    <div>
+                        <p class="text-sm text-gray-600">Projetos Ativos</p>
+                        <p class="text-2xl font-bold">${projetos.data?.filter(p => p.status === 'Ativo').length || 0}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow">
+                <div class="flex justify-between">
+                    <div>
+                        <p class="text-sm text-gray-600">Transações</p>
+                        <p class="text-2xl font-bold">${totalTransacoes}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+// Inicialização
+document.addEventListener('DOMContentLoaded', () => {
+    checkAdmin();
+    carregarDashboardAdmin();
+});
+</script>
+
+</body>
+</html>
