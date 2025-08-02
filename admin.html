@@ -2,12 +2,13 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>InvistaTop2 - Admin Deploy</title>
+  <title>InvistaTop2 Admin Deploy</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 </head>
 <body class="bg-gray-100 font-sans">
 <div class="flex h-screen">
+
   <!-- Sidebar -->
   <aside class="w-64 bg-gray-900 text-white p-4">
     <h2 class="text-xl font-bold mb-6">InvistaTop2 Admin</h2>
@@ -17,25 +18,24 @@
     </nav>
   </aside>
 
-  <!-- Main Content -->
+  <!-- Main -->
   <main id="main" class="flex-1 p-8">
+    <!-- ===== ÁREA DEPLOY ===== -->
     <div id="deploy-area" class="space-y-6">
-      <!-- Botão Atualizar Banco -->
+      <!-- Atualizar Banco -->
       <div class="bg-white p-6 rounded shadow">
-        <h3 class="text-lg font-bold mb-2">Atualizar Banco de Dados</h3>
-        <p class="text-sm text-gray-600 mb-4">Cria/altera tabelas sem perder dados existentes</p>
+        <h3 class="text-lg font-bold mb-2">1. Atualizar Banco (InvistaTop2)</h3>
         <button onclick="atualizarBanco()" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
           🔄 Atualizar Banco
         </button>
         <div id="bd-result" class="mt-2 text-sm"></div>
       </div>
 
-      <!-- Botão Upload GitHub -->
+      <!-- Upload GitHub -->
       <div class="bg-white p-6 rounded shadow">
-        <h3 class="text-lg font-bold mb-2">Upload para GitHub</h3>
-        <p class="text-sm text-gray-600 mb-4">Enviar código para repositório</p>
-        <input type="password" id="github-token" placeholder="Seu GitHub Token" class="w-full p-2 border rounded mb-2">
-        <input type="text" id="repo-name" placeholder="nome/repositorio" class="w-full p-2 border rounded mb-2" value="invistatop/site">
+        <h3 class="text-lg font-bold mb-2">2. Upload para GitHub</h3>
+        <input type="password" id="github-token" placeholder="Token GitHub" class="w-full p-2 border rounded mb-2" value="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">
+        <input type="text" id="repo-name" placeholder="usuário/repositório" class="w-full p-2 border rounded mb-2" value="linkportal/InvistaTop_Agix17">
         <button onclick="uploadGitHub()" class="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700">
           📤 Upload GitHub
         </button>
@@ -43,7 +43,7 @@
       </div>
     </div>
 
-    <!-- Dashboard Preview -->
+    <!-- ===== DASHBOARD ===== -->
     <div id="dashboard-area" class="hidden">
       <h1 class="text-2xl font-bold mb-4">Dashboard - Dados Reais</h1>
       <div id="dashboard-content" class="bg-white p-4 rounded shadow"></div>
@@ -52,21 +52,18 @@
 </div>
 
 <script>
-// Configurações
+// ===== CONFIG =====
 const supabase = supabase.createClient(
   'https://bhhynlkstyraemgkjhoe.supabase.co',
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJoaHlubGtzdHlyYWVtZ2tqaG9lIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTIzMTA5NTAsImV4cCI6MjA2Nzg4Njk1MH0.FnPMp882tTyKwka73jzsgfMfh0nGO4K5pyL34TJtUUQ'
 );
 
-const GITHUB_TOKEN = 'ghp_seu_token_aqui'; // Substitua pelo seu token
-const REPO_NAME = 'invistatop/site'; // Substitua pelo seu repositório
-
-// Botão Atualizar Banco
+// ===== ATUALIZAR BANCO =====
 async function atualizarBanco() {
   const btn = event.target;
   btn.disabled = true;
   btn.textContent = 'Atualizando...';
-  
+
   const sql = `
 -- ✅ MIGRAÇÃO SEGURA INVISTATOP2 (preserva dados)
 CREATE TABLE IF NOT EXISTS niveis_usuario (
@@ -116,7 +113,7 @@ CREATE TABLE IF NOT EXISTS investimentos (
 CREATE TABLE IF NOT EXISTS transacoes (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     usuario_id UUID REFERENCES auth.users(id),
-    tipo VARCHAR(20) CHECK(tipo IN ('deposito', 'saque', 'investimento')),
+    tipo VARCHAR(20) CHECK(tipo IN ('deposito', 'saque', 'investimento', 'dividendo', 'comissao')),
     valor DECIMAL(15,2),
     status VARCHAR(15) DEFAULT 'pendente',
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
@@ -135,67 +132,55 @@ CREATE POLICY "Usuários veem próprios dados" ON investimentos FOR ALL USING (a
   try {
     const { error } = await supabase.rpc('exec_sql', { sql });
     if (error) throw error;
-    
-    document.getElementById('bd-result').innerHTML = 
-      '<span class="text-green-600">✅ Banco atualizado com sucesso!</span>';
+    document.getElementById('bd-result').innerHTML = '<span class="text-green-600">✅ Banco atualizado!</span>';
   } catch (err) {
-    document.getElementById('bd-result').innerHTML = 
-      `<span class="text-red-600">❌ Erro: ${err.message}</span>`;
+    document.getElementById('bd-result').innerHTML = `<span class="text-red-600">❌ ${err.message}</span>`;
   } finally {
     btn.disabled = false;
     btn.textContent = '🔄 Atualizar Banco';
   }
 }
 
-// Botão Upload GitHub
+// ===== UPLOAD GITHUB =====
 async function uploadGitHub() {
   const token = document.getElementById('github-token').value;
   const repo = document.getElementById('repo-name').value;
   const btn = event.target;
   
-  if (!token || !repo) {
-    alert('Preencha GitHub Token e Nome do Repositório');
-    return;
-  }
+  if (!token || !repo) return alert('Preencha token e repositório');
   
   btn.disabled = true;
   btn.textContent = 'Enviando...';
-  
-  const codigo = {
-    'index.html': `<!DOCTYPE html><html><head><title>InvistaTop2</title><script src="https://cdn.tailwindcss.com"></script><script src="https://unpkg.com/@supabase/supabase-js@2"></script></head><body class="bg-gray-50"><nav class="bg-white p-4 shadow"><h1 class="text-xl font-bold text-blue-600">InvistaTop2</h1></nav><div class="p-8 text-center"><h2 class="text-3xl font-bold mb-4">Investimentos Imobiliários Inteligentes</h2><button onclick="login()" class="bg-blue-600 text-white px-6 py-2 rounded">Entrar</button></div><script>const sup=supabase.createClient('https://bhhynlkstyraemgkjhoe.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJoaHlubGtzdHlyYWVtZ2tqaG9lIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTIzMTA5NTAsImV4cCI6MjA2Nzg4Njk1MH0.FnPMp882tTyKwka73jzsgfMfh0nGO4K5pyL34TJtUUQ'); async function login(){const{data}=await sup.auth.signInWithPassword({email:'teste@email.com',password:'123456'});if(data.user)window.location.href='dashboard.html';}</script></body></html>`,
+
+  const arquivos = {
+    'index.html': `<!DOCTYPE html><html><head><title>InvistaTop2</title><script src="https://cdn.tailwindcss.com"></script><script src="https://unpkg.com/@supabase/supabase-js@2"></script></head><body class="bg-gray-50"><nav class="bg-white p-4 shadow"><h1 class="text-xl font-bold text-blue-600">InvistaTop2</h1></nav><div class="p-8 text-center"><h2 class="text-3xl font-bold mb-4">Investimentos Imobiliários Inteligentes</h2><button onclick="login()" class="bg-blue-600 text-white px-6 py-2 rounded">Entrar</button></div><script>const sup=supabase.createClient('https://bhhynlkstyraemgkjhoe.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJoaHlubGtzdHlyYWVtZ2tqaG9lIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTIzMTA5NTAsImV4cCI6MjA2Nzg4Njk1MH0.FnPMp882tTyKwka73jzsgfMfh0nGO4K5pyL34TJtUUQ');async function login(){const{data}=await sup.auth.signInWithPassword({email:'teste@email.com',password:'123456'});if(data.user)window.location.href='dashboard.html';}</script></body></html>`,
     
-    'dashboard.html': `<!DOCTYPE html><html><head><title>Dashboard</title><script src="https://cdn.tailwindcss.com"></script><script src="https://unpkg.com/@supabase/supabase-js@2"></script></head><body class="bg-gray-100"><div class="p-8"><h1 class="text-2xl font-bold mb-4">Dashboard</h1><div id="dados" class="bg-white p-4 rounded shadow"></div></div><script>const sup=supabase.createClient('https://bhhynlkstyraemgkjhoe.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJoaHlubGtzdHlyYWVtZ2tqaG9lIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTIzMTA5NTAsImV4cCI6MjA2Nzg4Njk1MH0.FnPMp882tTyKwka73jzsgfMfh0nGO4K5pyL34TJtUUQ');async function init(){const{data:{user}}=await sup.auth.getUser();if(!user)return;const{data:perf}=await sup.from('perfis').select('*').eq('id',user.id).single();const{data:inv}=await sup.from('investimentos').select('*,projetos(*)').eq('usuario_id',user.id);const total=inv?.reduce((s,i)=>s+i.valor_investido,0)||0;document.getElementById('dados').innerHTML=\`<p>Olá, \${perf.nome}</p><p>Total investido: R$ \${total.toLocaleString()}</p>\`;}init();</script></body></html>`,
+    'dashboard.html': `<!DOCTYPE html><html><head><title>Dashboard</title><script src="https://cdn.tailwindcss.com"></script><script src="https://unpkg.com/@supabase/supabase-js@2"></script></head><body class="bg-gray-100"><div class="p-8"><h1 class="text-2xl font-bold mb-4">Dashboard</h1><div id="dados" class="bg-white p-4 rounded shadow"></div></div><script>const sup=supabase.createClient('https://bhhynlkstyraemgkjhoe.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJoaHlubGtzdHlyYWVtZ2tqaG9lIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTIzMTA5NTAsImV4cCI6MjA2Nzg4Njk1MH0.FnPMp882tTyKwka73jzsgfMfh0nGO4K5pyL34TJtUUQ');async function init(){const{data:{user}}=await sup.auth.getUser();if(!user)return;const{data:perf}=await sup.from('perfis').select('*').eq('id',user.id).single();document.getElementById('dados').innerHTML=\`<p>Olá, \${perf.nome}</p><p>Saldo: R$ \${perf.saldo.toLocaleString()}</p>\`;}init();</script></body></html>`,
     
-    'admin.html': `<!-- Código completo do admin.html já criado acima -->`
+    'admin.html': `<!-- Código completo deste arquivo -->`
   };
 
-  try {
-    for (const [filename, content] of Object.entries(codigo)) {
-      await fetch(`https://api.github.com/repos/${repo}/contents/${filename}`, {
-        method: 'PUT',
-        headers: {
-          'Authorization': `token ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          message: `Deploy InvistaTop2 - ${new Date().toISOString()}`,
-          content: btoa(content)
-        })
-      });
-    }
-    
-    document.getElementById('github-result').innerHTML = 
-      `<span class="text-green-600">✅ Código enviado para https://github.com/${repo}</span>`;
-  } catch (err) {
-    document.getElementById('github-result').innerHTML = 
-      `<span class="text-red-600">❌ Erro: ${err.message}</span>`;
-  } finally {
-    btn.disabled = false;
-    btn.textContent = '📤 Upload GitHub';
+  for (const [filename, content] of Object.entries(arquivos)) {
+    await fetch(`https://api.github.com/repos/${repo}/contents/${filename}`, {
+      method: 'PUT',
+      headers: {
+        'Authorization': `token ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        message: `Deploy InvistaTop2 - ${new Date().toISOString()}`,
+        content: btoa(content)
+      })
+    });
   }
+  
+  document.getElementById('github-result').innerHTML = 
+    `<span class="text-green-600">✅ Código enviado para https://github.com/${repo}</span>`;
+  btn.disabled = false;
+  btn.textContent = '📤 Upload GitHub';
 }
 
-// Navegação
+// ===== NAVEGAÇÃO =====
 function nav(section) {
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active','bg-blue-600'));
   event.target.classList.add('active','bg-blue-600');
@@ -210,37 +195,6 @@ function nav(section) {
   }
 }
 
-// Dashboard Admin
-async function carregarDashboard() {
-  const [usuarios, projetos, transacoes] = await Promise.all([
-    supabase.from('perfis').select('count').single(),
-    supabase.from('projetos').select('*'),
-    supabase.from('transacoes').select('count').single()
-  ]);
-  
-  const totalUsers = usuarios.data.count;
-  const totalInvestido = projetos.data?.reduce((s, p) => s + p.valor_captado, 0) || 0;
-  const totalTx = transacoes.data.count;
-  
-  document.getElementById('dashboard-content').innerHTML = `
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-      <div class="bg-white p-6 rounded shadow">
-        <h3 class="text-sm text-gray-500">Usuários</h3>
-        <p class="text-3xl font-bold">${totalUsers}</p>
-      </div>
-      <div class="bg-white p-6 rounded shadow">
-        <h3 class="text-sm text-gray-500">Captado</h3>
-        <p class="text-3xl font-bold">R$ ${(totalInvestido/1000000).toFixed(1)}M</p>
-      </div>
-      <div class="bg-white p-6 rounded shadow">
-        <h3 class="text-sm text-gray-500">Transações</h3>
-        <p class="text-3xl font-bold">${totalTx}</p>
-      </div>
-    </div>
-  `;
-}
-
-// Inicialização
 document.addEventListener('DOMContentLoaded', () => {
   carregarDashboard();
 });
